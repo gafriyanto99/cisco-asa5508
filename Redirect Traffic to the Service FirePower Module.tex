@@ -1,0 +1,25 @@
+1. Select the traffic that should be identified with the access-list command. In this example, all of the traffic from all of the interfaces is redirected. You can do this for specific traffic as well.
+		ciscoasa(config)# access-list sfr_redirect extended permit ip any any
+
+2. Create a class-map in order to match the traffic on an access list:
+		ciscoasa(config)# class-map sfr
+		ciscoasa(config-cmap)# match access-list sfr_redirect
+	
+3. Specify the deployment mode. You can configure your device in either a passive (monitor-only) or inline (normal) deployment mode.
+	In an inline deployment, after the undesired traffic is dropped and any other actions that are applied by policy are performed, the traffic is returned to the ASA for further processing and ultimate transmission. This example shows how to create a policy-map and configure the ASA SFR module in the inline mode:
+		ciscoasa(config)# policy-map global_policy
+		ciscoasa(config-pmap)# class sfr
+		ciscoasa(config-pmap-c)# sfr fail-open
+
+	In a passive deployment, a copy of the traffic is sent to the SFR service module, but it is not returned to the ASA. Passive mode allows you to view the actions that the SFR module would have completed in regards to the traffic. It also allows you to evaluate the content of the traffic, without an impact to the network.
+	If you want to configure the SFR module in passive mode, use the monitor-only keyword (as shown in the next example). If you do not include the keyword, the traffic is sent in inline mode.
+		ciscoasa(config-pmap-c)# sfr fail-open monitor-only
+		
+4. Specify a location and apply the policy. You can apply a policy globally or on an interface. In order to override the global policy on an interface, you can apply a service policy to that interface.
+
+	The global keyword applies the policy map to all of the interfaces, and the interface keyword applies the policy to one interface. Only one global policy is allowed. In this example, the policy is applied globally:
+		iscoasa(config)# service-policy global_policy global
+		
+		
+		
+Ref: https://www.cisco.com/c/en/us/support/docs/security/asa-firepower-services/118644-configure-firepower-00.html
